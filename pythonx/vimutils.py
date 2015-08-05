@@ -37,6 +37,16 @@ def let_vimrepr(varname, obj):
     vim.command('let {} = {}'.format(varname, vimrepr(obj)))
 
 
+def raw_textrepr(text):
+    """
+    command receive raw text as input. however, it needs to escape first.
+    for example:
+        :!touch a\ b " create a file named 'a b'
+        :e a\ b      " however ':e a b' won't work
+    """
+    return text.replace(' ', r'\ ').replace('"', r'\"').replace("'", r"\'")
+
+
 def target_exists(name, typ=None):
     """
     check if the target file(in general sense) exists in cwd or its acenstors.
@@ -65,4 +75,5 @@ def list_opened_files():
     """
     return a list of opened REAL files(excluding buftype of nofile etc).
     """
-    return [b.name for b in vim.buffers if not len(b.options['buftype'])]
+    return [b.name for b in vim.buffers
+            if not len(b.options['buftype']) and os.path.isfile(b.name)]
